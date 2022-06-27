@@ -1,11 +1,12 @@
 # 🌐 RecorderPlayer WebApp 
-<hr>
+
 This is source code of RecorderPlayer Web.
 
+
 ## ⚠️ Prerequisites
-<a href="https://www.python.org/downloads/release/python-3100/">Python 3.10.0</a>
-<a href="https://www.djangoproject.com/download/">Djanog 4.0.5</a>
-<a href="https://www.postgresql.org/download/">PostgreSQL 14.1</a>
+<a href="https://www.python.org/downloads/release/python-3100/">Python 3.10.0</a><br>
+<a href="https://www.djangoproject.com/download/">Djanog 4.0.5</a><br>
+<a href="https://www.postgresql.org/download/">PostgreSQL 14.1</a><br>
 
 ## 🛠 Build
 1. Create a venv environment `python -m venv ./venv` and activate it `source venv/bin/activate`
@@ -29,6 +30,6 @@ This is source code of RecorderPlayer Web.
  5. Create supperuser `python3 manage.py createsuperuser` after enter all needest values.
  6. Start the website `python3 manage.py runserver`
  7. Go to http://127.0.0.1:8000/
- 
+ <br>
  ## 📄 license
  Copyright ©2022 RecorderPlayer. Released under the MIT license.
