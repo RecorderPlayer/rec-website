@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -12,21 +13,27 @@ class UsersModel(models.Model):
     last_name = models.CharField(max_length=64, null=True)
     created_at = models.DateTimeField(auto_now=True)
     last_changes = models.DateTimeField()
-    avatar = models.BinaryField()
+    avatar = models.ImageField(upload_to='users_avatars/', null=True)
 
     notifications = models.ForeignKey(
         'authApp.NotificationsModel', on_delete=models.CASCADE)
-    # premium = models.ForeignKey('payments.PremiumsModel', on_delete=models.CASCADE)
+    premium = models.ForeignKey('paymentServicesApp.PremiumsModel', on_delete=models.CASCADE)
 
-    # queue = models.ManyToManyField('songs.SongsModel')
-    # playlists = models.ManyToManyField('playlist.PlaylistsModel')
-    # albums = models.ManyToManyField('albums.AlbumsModel')
+    queue = models.ManyToManyField('songsApp.SongsModel')
+    playlists = models.ManyToManyField('playlistsApp.PlaylistsModel')
+    albums = models.ManyToManyField('albumsApp.AlbumsModel')
     banned = models.BooleanField(default=False)
     special_status = models.ForeignKey('authApp.SpecialsStatusModel', null=True, on_delete=models.SET_NULL)
     social_networks = models.ForeignKey('authApp.SocialsNetworksModel', null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        verbose_name = "Users table"
+        verbose_name = "User"
+
+    def clean(self):
+        if str(self.avatar).split('.')[-1] not in ['jpg', 'jpeg', 'png']:
+            raise ValidationError(
+                {'avatar': "Icon file should be some of this formats: 'jpg', 'jpeg', 'png'"}
+            )
 
     def __str__(self):
         return str(self.crypto_wallet)
@@ -40,7 +47,7 @@ class NotificationsModel(models.Model):
     on_songs_skips = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Notifications table"
+        verbose_name = "Notification"
 
     def __str__(self):
         return str(self.id)
@@ -56,7 +63,8 @@ class SpecialsStatusModel(models.Model):
     youtube = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = "SpecialsStatus table"
+        verbose_name = "SpecialsStatus"
+        verbose_name_plural = "SpecialsStatuses"
 
     def __str__(self):
         return str(self.id)
@@ -75,7 +83,7 @@ class SocialsNetworksModel(models.Model):
     tiktok = models.CharField(max_length=256, null=True, default=None)
 
     class Meta:
-        verbose_name = "SocialsNetworks table"
+        verbose_name = "SocialsNetwork"
 
     def __str__(self):
         return str(self.id)
