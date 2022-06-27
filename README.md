@@ -29,7 +29,7 @@ This is source code of RecorderPlayer Web.
  4. Go to recorder direct by command `cd recorder`
  5. Create supperuser `python3 manage.py createsuperuser` after enter all needest values.
  6. Start the website `python3 manage.py runserver`
- 7. Go to http://127.0.0.1:8000/
- <br>
- ## 📄 license
+ 7. Go to http://127.0.0.1:8000/ <br>
+ 
+## 📄 License
  Copyright ©2022 RecorderPlayer. Released under the MIT license.
