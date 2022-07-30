@@ -1,0 +1,9 @@
+{% autoescape off %}
+
+To confirm your email you must click on link below:
+http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+
+
+If it was not you, just ignore this email.
+
+{% endautoescape %}

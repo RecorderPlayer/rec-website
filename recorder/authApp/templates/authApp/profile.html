@@ -1,0 +1,21 @@
+{% extends "playerApp/base.html" %}
+
+{% block title %}{% if user.is_authenticated %}Welcome{% else %}LogIn{% endif %}{% endblock %}
+
+{% block content %}
+    Hi {% if user.username %}{{ user.username }}{% else %}{{ user.email }}{% endif %} 👋<br>
+    <a href="{% url 'settings-profile' %}">Settings</a>
+    <a href="{% url 'logout' %}">Log Out</a><br>
+
+    <h1>Avatar</h1>
+    {% if user.avatar %}
+        <img src="{{ user.avatar.url }}" alt=""><br>
+    {% endif %}
+    <hr>
+
+    <h1>Banner</h1>
+    {% if user.banner %}
+        <img src="{{ user.banner.url }}" alt=""><br>
+    {% endif %}
+    <hr>
+{% endblock %}

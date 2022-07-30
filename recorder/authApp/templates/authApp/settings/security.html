@@ -1,0 +1,43 @@
+{% extends "playerApp/base.html" %}
+
+{% block title %}Settings | {{ settings_type }}{% endblock %}
+
+{% block content %}
+<div class="main" style="position: relative;">
+    <div class="left-bar" style="margin-left: 50px; position: absolute; left: 0;">
+        <a href="{% url 'settings-profile' %}" class="btn {% if 'profile' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 10px 10px 0px 0px; width: 200px;">Profile</a><br>
+        <a href="{% url 'settings-notifications' %}" class="btn {% if 'notifications' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Notifications</a><br>
+        <a href="{% url 'settings-subscription' %}" class="btn {% if 'subscription' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Subscription</a><br>
+        <a href="{% url 'settings-security' %}" class="btn {% if 'security' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Security</a><br>
+        <a href="" class="btn {% if 'payment-history' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px 0px 10px 10px ; width: 200px; ">Payment History</a><br>
+    </div>
+    <style>
+        .item {
+            background: grey;
+            width: 500px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: width 2s, background 2s;
+
+            margin-top: 10px;
+        }
+        .item:hover {
+            width: 450px;
+            background: #aaa;
+        }
+    </style>
+    <div class="security" style="position: absolute; left: 500px;">
+        <a href="{% url 'settings-security-change-password' %}" style="text-decoration: none; color: #000;">
+            <div class="item">
+            Change password
+            </div>
+        </a>
+
+        <a href="{% url 'settings-security-logs' %}" style="text-decoration: none; color: #000;">
+            <div class="item">
+            Login Logs
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

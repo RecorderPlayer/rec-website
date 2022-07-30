@@ -1,0 +1,42 @@
+{% extends "authApp/base.html" %}
+{% load static %}
+
+{% block title %}<h1>Create an account</h1>{% endblock %}
+
+{% block content %}
+    {% if register %}
+
+    <div class="position-relative" style="margin-top: 300px;">
+        <div class="log-in-form position-absolute top-100 start-50 translate-middle mt-1" style="padding:10px; border-radius: 20px; width: 500px; border: solid 1px #000;">
+
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <p>{{ form.errors }}</p></div>
+            {% endif %}
+
+            <p>Please, sign up using the following form:</p>
+            <form action="." method="post">
+                <div class="form-floating mb-3">
+                    {{ form.email }}
+                  <label for="floatingInput">Email</label>
+                </div>
+                <div class="form-floating">
+                    {{ form.password }}
+                  <label for="floatingPassword">Password</label>
+                </div>
+                <div class="form-floating mt-3">
+                    {{ form.repassword }}
+                  <label for="floatingPassword">Re-Password</label>
+                </div>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-2">Sign Up</button><br>
+                Do u have already account? <a href="{% url 'log-in' %}">LogIn</a>
+
+            </form>
+        </div>
+    </div>
+    {% else %}
+        <h1>Welcome {{ new_user.first_name }}!</h1>
+        <p>To confirm your account was sent email.</p>
+    {% endif %}
+{% endblock %}

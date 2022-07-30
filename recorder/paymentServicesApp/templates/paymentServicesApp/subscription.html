@@ -1,0 +1,40 @@
+{% extends "playerApp/base.html" %}
+{% load subscriptions_filters %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    {% if step == 'already-bought'%}
+        <div style="margin:0 auto; width: 500px; background-color: grey; border-radius: 10px; margin-bottom: 10px;" class="text-center">
+            You have already bought premium.<br>
+            If u want to continue ur subscription, <a href="{% url 'subscription_period' name=subscriptions.0.name %}">click</a> "Continue".<br>
+            Change subscription <a href="#">click</a>.
+        </div>
+    {% endif %}
+    {% if settings %}
+        <a href="{% url 'settings-subscription' %}" style="margin-left: 40px;"><img src="{% static 'subscription/arrow.png' %}" alt=""></a>
+    {% endif %}
+    <div class="{% if step == 'already-bought'%}text-center{% endif %}" style="width: 500px; margin:0 auto;">
+        {% if subscriptions %}
+            {% for subscription in subscriptions %}
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                      <div class="card-header py-3">
+                        <h4 class="my-0 fw-normal">{{ subscription.name }}</h4>
+                      </div>
+                      <div class="card-body">
+                        <h1 class="card-title pricing-card-title">${{ subscription.price }}<small class="text-muted fw-light">/mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                          {% for item in subscription.description|split %}
+                            <li>{{ item }}</li>
+                          {% endfor %}
+                        </ul>
+                          <a href="{% url 'subscription_period' name=subscription.name %}" class="w-100 btn btn-lg btn-outline-primary">{% if step == 'already-bought'%}Continue{% else %}Subscribe{% endif %}</a>
+                      </div>
+                    </div>
+                  </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "playerApp/base.html" %}
+{% load subscriptions_filters %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if messages and step != 'done'%}
+{% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert"  style="position: absolute; left: 500px; top: 100px; width: 400px; z-index: 10;">
+        <p>{{ message|safe }}</p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% endif %}
+<div class="block" id="block" style="background: grey; margin:0 auto; margin-top: 100px; padding: 10px;border-radius: 10px; border: solid 1px #000; width: 300px;">
+    {% if step == 'period' %}
+    <form action="{% url 'subscription_payment' name=subscription.name %}" method="get">
+        {% csrf_token %}
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" >
+                <li class="breadcrumb-item active" style="font-weight: bold; color: white;">Period</li>
+                <li class="breadcrumb-item active" style="color: #aaa;" aria-current="page">Payment</li>
+                <li class="breadcrumb-item active" style="color: #aaa;" aria-current="page">Status</li>
+            </ol>
+        </nav>
+        <span class="type">Subscription: {{ subscription.name }}</span><br>
+        <span>Choose one:</span>
+        {{ form.period }}
+        <input type="submit" value="Next ->" id="next-btn" class="btn btn-success mt-2" disabled>
+    </form>
+    {% elif step == 'payment' %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb" >
+            <li class="breadcrumb-item active" style="color: white;"><a href="{% url 'subscription_period' name=subscription.name %}" style="color: #fff; text-decoration: none;">Period</a></li>
+            <li class="breadcrumb-item active" style="font-weight: bold; color: white;" aria-current="page">Payment</li>
+            <li class="breadcrumb-item active" style="color: #aaa;" aria-current="page">Status</li>
+        </ol>
+    </nav>
+    <span class="type">Subscription: {{ subscription.name }}</span><br>
+    <span class="amount">Price: {{ price }} USD</span> {% if discount is not None %}<span style="background: blue; padding: 5px; border-radius: 10px;">-{{ discount }}%</span>{% endif %}<br>
+    <span class="period">Period: {{ period }} month</span><hr>
+
+    <button id="enableEthereumButton" class="enableEthereumButton btn btn-warning mt-2">Connect to MetaMask</button>
+    <button id="sendEthButton" class="sendEthButton btn btn-success mt-2">Send Eth</button>
+    <hr>
+    <a href="{% url 'subscription_period' name=subscription.name %}" class="btn btn-danger mt-2"><- Back</a>
+    {% elif step == 'done' %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb" >
+            <li class="breadcrumb-item active" style="color: white;">Period</li>
+            <li class="breadcrumb-item active" style="color: white;" aria-current="page">Payment</li>
+            <li class="breadcrumb-item active" style="font-weight: bold; color: white;" aria-current="page">Status</li>
+        </ol>
+    </nav>
+        {% if not messages %}
+            <span class="type">Subscription: {{ subscription.name }}</span><br>
+            <span class="amount">Price: {{ price }} USD</span> {% if discount is not None %}<span style="background: blue; padding: 5px; border-radius: 10px;">-{{ discount }}%</span>{% endif %}<br>
+            <span class="end_at">Date To: {{ end_at }}</span><br>
+            <span class="from">From: {{ from }}</span><br>
+            <span class="hash">Hash of transaction: <a href="https://etherscan.io/tx/{{ hash }}">{{ hash }}</a></span>
+            <span class="status" style="padding: 5px; border-radius: 10px; width: 50px; margin-left: 25%; background: green;">Success</span>
+        {% else %}
+            {% for message in messages %}
+                <span class="error">{{ message }}</span><br>
+                <span class="status" style="padding: 5px; border-radius: 10px; width: 50px; margin-left: 43%; background: red;">Error</span>
+            {% endfor %}
+    {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block script %}
+{% if step and step == 'payment' %}
+const ethereumButton = document.getElementById('enableEthereumButton');
+const sendEthButton = document.getElementById('sendEthButton');
+
+let accounts = [];
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+sendEthButton.addEventListener('click', () => {
+  getAccount();
+
+  price = Number({{ price_eth }}).toString(16);
+
+  ethereum
+    .request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: accounts[0],
+          to: {{ wallet_to }}.toString(16),
+          value: price,
+          gasPrice: Number(2500000).toString(16),
+          gas: Number(21000).toString(16),
+        },
+      ],
+    })
+    .then((txHash) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'subscription_payment' name=subscription.name %}");
+
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+        xhr.send(new URLSearchParams({
+            "txHash":txHash,
+            "period": {{ period }},
+            "from": accounts[0],
+        }));
+        xhr.onload = () => {
+            if (xhr.responseText === '{"status": "success"}'){
+                console.log("Success");
+                window.location.href = "{% url 'subscription_success' %}"
+                // document.getElementsByTagName('html')[0].innerHTML = xhr.responseText
+            } else {
+                document.getElementsByTagName('html')[0].innerHTML = xhr.responseText;
+            }
+        };
+        xhr.onprogress = () => console.log();
+        // xhr.onprogress = () => window.location.href = "{% url 'subscription_success' %}";
+
+    }).catch((error) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'subscription_payment' name=subscription.name %}");
+
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+        xhr.onload = () => document.getElementsByTagName('html')[0].innerHTML = xhr.responseText;
+        xhr.send(new URLSearchParams({
+            "error_code": error.code,
+            "message": error.message,
+            "period": {{ period }},
+        }));
+    });
+});
+
+async function getAccount() {
+    if (typeof window.ethereum !== "undefined") {
+          ethereum
+            .request({ method: "eth_requestAccounts" })
+            .then((accounts_) => {
+               accounts = accounts_;
+               ethereumButton.disabled=true;
+               ethereumButton.textContent="Connected MetaMask";
+          }).catch((error) => {
+          });
+       } else {
+          window.open("https://metamask.io/download/", "_blank");
+       }
+
+  ethereumButton.textContent="Connected MetaMask";
+  ethereumButton.disabled=true;
+}
+
+ethereumButton.addEventListener("click", () => {
+    getAccount();
+})
+{% elif step == 'period' %}
+const nextButton = document.getElementById('next-btn');
+const radioSelectButtons = document.getElementById('RadioSelectBTNS');
+
+radioSelectButtons.addEventListener('change', (event) => {
+        nextButton.disabled=false;
+    })
+
+{% endif %}
+
+{% endblock%}

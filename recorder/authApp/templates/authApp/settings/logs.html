@@ -1,0 +1,88 @@
+{% extends "playerApp/base.html" %}
+
+{% block title %}Settings | {{ settings_type }}{% endblock %}
+
+{% block content %}
+
+<div class="main" style="position: relative;">
+    <div class="left-bar" style="margin-left: 50px; position: absolute; left: 0;">
+        <a href="{% url 'settings-profile' %}" class="btn {% if 'profile' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 10px 10px 0px 0px; width: 200px;">Profile</a><br>
+        <a href="{% url 'settings-notifications' %}" class="btn {% if 'notifications' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Notifications</a><br>
+        <a href="{% url 'settings-subscription' %}" class="btn {% if 'subscription' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Subscription</a><br>
+        <a href="{% url 'settings-security' %}" class="btn {% if 'security' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Security</a><br>
+        <a href="" class="btn {% if 'payment-history' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px 0px 10px 10px ; width: 200px; ">Payment History</a><br>
+    </div>
+    <nav aria-label="breadcrumb" style="margin-left: 350px; width: 150px; background: #ccc; padding: 5px; padding-bottom: 1px; border-radius: 10px;">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'settings-security' %}">Security</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Logs</li>
+      </ol>
+    </nav>
+    <style>
+        .device-item {
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+    {% if form.errors %}
+        {% for error in form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: absolute; right: 0; width: 400px; z-index: 10;">
+                {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert"  style="position: absolute; right: 0; width: 400px; z-index: 10;">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card" style="float: right; background: grey; margin-right: 400px; width: 500px; padding: 10px;">
+        <h1>Current device</h1>
+        <div class="device-item">Device name: {{ current_device.name }}</div>
+        <div class="device-item">IP: {{ current_device.ip }}</div>
+        <div class="device-item">Coord: {{ current_device.coord }}</div>
+        <div class="device-item">Country: {{ current_device.country }}</div>
+        <div class="device-item">Is active now: {{ current_device.is_active }}</div>
+        <div class="device-item">Last login was: {{ current_device.last_login }}</div>
+        <div class="device-item">Joined at: {{ current_device.joined_at }}</div>
+        <a href="{% url 'settings-security-change-password' %}" class="btn btn-danger">Delete</a>
+    </div>
+
+    <div class="other-devices" style="background: grey; right: 0; top: 450px; margin-right: 400px; position: absolute; border-radius: 10px;">
+        <h1>Other devices</h1>
+        {% for device in devices %}
+            {% if device != current_device %}
+            <div class="card" style="background: grey; width: 500px; padding: 10px;">
+                <div class="device-item">Device name: {{ device.name }}</div>
+                <div class="device-item">IP: {{ current_device.ip }}</div>
+                <div class="device-item">Coord: {{ current_device.coord }}</div>
+                <div class="device-item">Country: {{ current_device.country }}</div>
+                <div class="device-item">Is active now: {{ current_device.is_active }}</div>
+                <div class="device-item">Last login was: {{ current_device.last_login }}</div>
+                <div class="device-item">Joined at: {{ current_device.joined_at }}</div>
+                <a href="{% url 'settings-security-change-password' %}" class="btn btn-danger">Delete</a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+    $("#SettingsForm").on("change", "input:checkbox", function(){
+        $("#SettingsForm").submit();
+    });
+});
+</script>
+{% endblock %}
+{% block script %}
+    var alertNode = document.querySelector('.alert')
+    var alert = bootstrap.Alert.getInstance(alertNode)
+    alert.close()
+{% endblock %}

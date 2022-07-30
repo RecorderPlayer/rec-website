@@ -17,9 +17,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-
+from django.contrib.auth.views import auth_login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/login/', auth_login, {'template_name': 'authApp/login.html'}),
+    path('user/', include('authApp.urls')),
+    path('subscription/', include('paymentServicesApp.urls')),
+    path('', include('playerApp.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
+  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

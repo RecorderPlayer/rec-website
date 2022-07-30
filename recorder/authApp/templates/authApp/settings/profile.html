@@ -1,0 +1,48 @@
+{% extends "playerApp/base.html" %}
+
+{% block title %}Settings | {{ settings_type }}{% endblock %}
+
+{% block content %}
+<div class="main" style="position: relative;">
+    <div class="left-bar" style="margin-left: 50px; position: absolute; left: 0;">
+        <a href="{% url 'settings-profile' %}" class="btn {% if 'profile' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 10px 10px 0px 0px; width: 200px;">Profile</a><br>
+        <a href="{% url 'settings-notifications' %}" class="btn {% if 'notifications' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Notifications</a><br>
+        <a href="{% url 'settings-subscription' %}" class="btn {% if 'subscription' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Subscription</a><br>
+        <a href="{% url 'settings-security' %}" class="btn {% if 'security' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px; width: 200px;">Security</a><br>
+        <a href="" class="btn {% if 'payment-history' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" style="border-radius: 0px 0px 10px 10px ; width: 200px; ">Payment History</a><br>
+    </div>
+    {% if form.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: absolute; right: 0; width: 400px; z-index: 10;">
+            {{ form.errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert"  style="position: absolute; right: 0; width: 400px; z-index: 10;">
+                    {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    <form action="." method="post" enctype="multipart/form-data" id="SettingsForm" style="position: absolute; left: 500px; width: 450px;">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="row g-1 align-items-center" style="padding: 10px; background: grey; align-items: center; border-radius: 10px; margin-bottom: 30px;">
+          <div class="col-auto">
+            <label class="col-form-label" >{{ field.label}}</label>
+          </div>
+          <div class="col-auto" id="field">
+              {{ field }}
+          </div>
+        </div>
+        {% endfor %}
+    </form>
+</div>
+{% endblock %}
+
+{% block script %}
+    var alertNode = document.querySelector('.alert')
+    var alert = bootstrap.Alert.getInstance(alertNode)
+    alert.close()
+{% endblock %}

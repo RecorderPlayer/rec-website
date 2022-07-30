@@ -9,14 +9,14 @@ class SongsModel(models.Model):
     In the future, it will be replaced by a blockchain
     """
     name = models.CharField(max_length=64)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     listening = models.BigIntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True)
-    author = models.CharField(max_length=256)
+    authors = models.ManyToManyField('authApp.UsersModel', related_name="SongAuthors")
     song_file = models.FileField(upload_to='songs/files/')
-    icon = models.ImageField(upload_to='songs/images/', null=True)
-    price = models.DecimalField(max_digits=18, decimal_places=6)
-    owner = models.CharField(max_length=256)
+    icon = models.ImageField(upload_to='songs/images/', blank=True, null=True)
+    price = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
+    owner = models.ForeignKey('authApp.UsersModel', related_name="SongOwner", on_delete=models.SET_DEFAULT, default=None)
 
     class Meta:
         verbose_name = "Song"

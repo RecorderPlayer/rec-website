@@ -11,7 +11,7 @@ class AlbumsModel(models.Model):
     icon = models.ImageField(upload_to='albums_icons/', null=True)
     songs = models.ManyToManyField('songsApp.SongsModel')
     rate = models.FloatField(default=0)
-    author = models.ForeignKey('authApp.UsersModel', on_delete=models.CASCADE)
+    authors = models.ManyToManyField('authApp.UsersModel')
 
     class Meta:
         verbose_name = "Album"

@@ -8,11 +8,11 @@ class PlaylistsModel(models.Model):
     Create a Playlists table for the database
     """
     name = models.CharField(max_length=64)
-    description = models.TextField(null=True)
-    icon = models.ImageField(null=True, upload_to='playlists_icons/')
-    songs = models.ManyToManyField('songsApp.SongsModel')
+    description = models.TextField(null=True, blank=True)
+    icon = models.ImageField(null=True, upload_to='playlists_icons/', blank=True)
+    songs = models.ManyToManyField('songsApp.SongsModel', null=True, blank=True)
     rate = models.FloatField(default=0)
-    author = models.ForeignKey('authApp.UsersModel', on_delete=models.CASCADE)
+    author = models.ForeignKey('authApp.UsersModel', on_delete=models.CASCADE, default=None)
 
     class Meta:
         verbose_name = "Playlist"

@@ -1,0 +1,46 @@
+{% extends "authApp/base.html" %}
+{% load static %}
+{% block title %}{% if user.is_authenticated %}Welcome{% else %}LogIn{% endif %}{% endblock %}
+
+{% block content %}
+<div class="position-relative" style="margin-top: 300px;">
+        <div class="messages" style="position: absolute; right: 30px; top: -150px;">
+        {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="width: 400px;">
+                {{ form.errors }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert"  style="position: absolute; right: 0; width: 400px; z-index: 10;">
+                    {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+        <div class="log-in-form position-absolute top-100 start-50 translate-middle mt-1" style="padding:10px; border-radius: 20px; width: 500px; border: solid 1px #000;">
+            <p>Log in using the following form:</p>
+            <form action="." method="post">
+                <div class="form-floating mb-3">
+                    {{ form.email }}
+                  <label for="floatingInput">Email</label>
+                </div>
+                <div class="form-floating">
+                    {{ form.password }}
+                  <label for="floatingPassword">Password</label>
+                </div>
+
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-2">LogIn</button><br>
+                <a href="{% url 'register' %}">Register</a> | <a href="{% url 'password_reset' %}">Forgot password?</a>
+            </form>
+        </div>
+</div>
+{% endblock %}
+{% block script %}
+    var alertNode = document.querySelector('.alert')
+    var alert = bootstrap.Alert.getInstance(alertNode)
+    alert.close()
+{% endblock %}
